@@ -13,6 +13,7 @@ fn expr_to_string(i: &Expr) -> String {
     }
 }
 
+#[derive(Debug)]
 pub struct InsertQuery {
     pub table_name: String,
     pub columns: Vec<String>,

@@ -11,4 +11,7 @@ pub enum StatementError {
 
     #[error("Not implemented")]
     NotImplementedError(),
+
+    #[error("No `into` parameter specified for Select Query. Each Select needs to have an into parameter specified.")]
+    NoIntoSpecifiedForSelect(),
 }

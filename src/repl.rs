@@ -15,6 +15,8 @@ use sqlparser::{
 use std::error::Error;
 use std::io::{self, BufRead, Write};
 
+use crate::models::insert_query;
+
 mod models;
 
 pub fn string_to_query(q: String) -> Result<Statement, StatementError> {
@@ -69,49 +71,28 @@ fn main() -> io::Result<()> {
             vec![]
         });
 
-        // println!("\nAST: {:?}", ast);
-
         for statement in ast.iter() {
             match statement {
                 Query(query) => {
-                    match &*query.body {
-                        Select(select) => {
-                            println!("Into: {:?}", select.into);
-
-                            for projection in select.projection.iter() {
-                                println!("{:?}", projection);
-                            }
-
-                            for from in select.from.iter() {
-                                println!("{:?}", from);
-                            }
-
-                            // println!("from: {:?}", select.from);
-                        }
-
-                        _ => {
-                            println!("Nothing to see here");
-                        }
-                    }
+                    let select_query = SelectQuery::try_from(&*query.body);
+                    println!("Select!: {:?}", select_query)
                 }
                 Insert {
-                    or,
-                    into,
-                    table_name,
-                    after_columns,
-                    columns,
-                    source,
-                    overwrite,
-                    partitioned,
-                    table,
-                    on,
-                    returning,
+                    or: _,
+                    into: _,
+                    table_name: _,
+                    after_columns: _,
+                    columns: _,
+                    source: _,
+                    overwrite: _,
+                    partitioned: _,
+                    table: _,
+                    on: _,
+                    returning: _,
                 } => {
-                    println!("{:?}", table_name);
-                    // println!("\n{:?}", after_columns);
-                    println!("\n{:?}", columns);
-                    println!("\n{:?}", source);
-                    // println!("\n{:?} ", partitioned);
+                    let insert_query = InsertQuery::try_from(statement);
+
+                    println!("Insert! {:?}", insert_query);
                 }
                 _ => {
                     println!("Found something else");

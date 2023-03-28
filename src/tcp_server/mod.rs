@@ -5,7 +5,7 @@ use tokio::sync::mpsc::Sender;
 
 use std::error::Error;
 
-use crate::TcpStreamMessage;
+use turnip_rs::TcpStreamMessage;
 
 pub async fn create_server(
     addr: String,
@@ -14,7 +14,7 @@ pub async fn create_server(
     let listener = TcpListener::bind(&addr).await?;
 
     loop {
-        let (mut stream, remote_address) = listener.accept().await?;
+        let (stream, remote_address) = listener.accept().await?;
 
         println!("Received connection from {}", remote_address);
 

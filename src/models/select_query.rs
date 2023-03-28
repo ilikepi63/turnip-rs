@@ -6,6 +6,7 @@ use sqlparser::ast::{
 
 use super::errors::StatementError;
 
+#[derive(Debug)]
 pub struct SelectQuery {
     pub into: String,
     pub projection: Vec<SelectItem>,
@@ -19,14 +20,14 @@ impl TryFrom<&SetExpr> for SelectQuery {
         if let Select(select) = value {
             let into = match match &select.into {
                 Some(v) => Ok(v),
-                None => Err(StatementError::NotImplementedError()),
+                None => Err(StatementError::NoIntoSpecifiedForSelect()),
             }?
             .name
             .0
             .first()
             {
                 Some(v) => Ok(v.value.clone()),
-                None => Err(StatementError::NotImplementedError()),
+                None => Err(StatementError::NoIntoSpecifiedForSelect()),
             }?;
 
             let projection = &select.projection;
