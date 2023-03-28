@@ -22,3 +22,7 @@ path = "src/main.rs"
 [[bin]]
 name = "repl"
 path = "src/repl.rs"
+
+[[bin]]
+name = "two"
+path = "src/runtime_two.rs"
