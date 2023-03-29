@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use sqlparser::ast::{
     Expr, Ident, SetExpr,
     Statement::{self, Insert},
@@ -8,12 +9,15 @@ use super::errors::StatementError;
 
 fn expr_to_string(i: &Expr) -> String {
     match i {
-        Expr::Identifier(Ident { value, quote_style }) => value.clone(),
+        Expr::Identifier(Ident {
+            value,
+            quote_style: _,
+        }) => value.clone(),
         _ => "".to_string(),
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct InsertQuery {
     pub table_name: String,
     pub columns: Vec<String>,
@@ -39,7 +43,10 @@ impl TryFrom<&Statement> for InsertQuery {
         } = value
         {
             let rows = match &*source.body {
-                SetExpr::Values(Values { explicit_row, rows }) => Ok(rows
+                SetExpr::Values(Values {
+                    explicit_row: _,
+                    rows,
+                }) => Ok(rows
                     .iter()
                     .map(|row| row.iter().map(|v| expr_to_string(v)).collect())
                     .collect()),

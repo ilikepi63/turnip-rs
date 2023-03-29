@@ -1,5 +1,5 @@
 [package]
-name = "turnip-rs"
+name = "turnip_rs"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,7 +9,8 @@ edition = "2021"
 tokio = {version = "1", features = ["full"]}
 sqlparser = "0.32.0"
 thiserror = "1.0.40"
-
+postcard = "1.0.4"
+serde = { version = "1.0", features = ["derive"]}
 
 [[bin]]
 name = "client"
@@ -25,4 +26,4 @@ path = "src/repl.rs"
 
 [[bin]]
 name = "two"
-path = "src/runtime_two.rs"
+path = "src/repl_two.rs"

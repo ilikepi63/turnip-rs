@@ -1,15 +1,16 @@
+use serde::{Deserialize, Serialize};
 use sqlparser::ast::{
-    Query, SelectItem,
+    SelectItem,
     SetExpr::{self, Select},
-    Statement, TableFactor, TableWithJoins,
+    TableFactor,
 };
 
 use super::errors::StatementError;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SelectQuery {
     pub into: String,
-    pub projection: Vec<SelectItem>,
+    pub projection: Vec<String>,
     pub from: String,
 }
 
@@ -30,15 +31,25 @@ impl TryFrom<&SetExpr> for SelectQuery {
                 None => Err(StatementError::NoIntoSpecifiedForSelect()),
             }?;
 
-            let projection = &select.projection;
+            let projection: Vec<String> = select
+                .projection
+                .iter()
+                .map(|v| match v {
+                    SelectItem::UnnamedExpr(expr) => match expr {
+                        sqlparser::ast::Expr::Identifier(ident) => ident.value.clone(),
+                        _ => "".to_string(),
+                    },
+                    _ => "*".to_string(),
+                })
+                .collect();
 
             let from = match select.from.first() {
                 Some(v) => match &v.relation {
                     TableFactor::Table {
                         name,
-                        alias,
-                        args,
-                        with_hints,
+                        alias: _,
+                        args: _,
+                        with_hints: _,
                     } => match name.0.first() {
                         Some(v) => Ok(v.value.clone()),
                         None => Err(StatementError::NotImplementedError()),
@@ -50,7 +61,7 @@ impl TryFrom<&SetExpr> for SelectQuery {
 
             return Ok(SelectQuery {
                 into,
-                projection: projection.to_vec(),
+                projection: projection,
                 from,
             });
         } else {

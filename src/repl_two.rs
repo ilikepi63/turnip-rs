@@ -3,7 +3,7 @@ use models::insert_query::InsertQuery;
 use models::select_query::SelectQuery;
 use runtime::TurnipRuntime;
 
-use postcard::{to_vec, from_bytes};
+use postcard::to_vec;
 use sqlparser::parser::Parser;
 use sqlparser::{
     ast::Statement::{Insert, Query},
@@ -20,41 +20,15 @@ async fn main() -> io::Result<()> {
     let stdin = io::stdin();
 
     // the runtime
-    let mut runtime = TurnipRuntime::new("8080");
+    let mut runtime = TurnipRuntime::new("8082");
+
+    runtime.add_connections(vec!["127.0.0.1:8080".to_string()]);
 
     runtime.run();
 
     let messenger = runtime
         .get_messenger()
         .expect("Could not get the messenger from the runtime");
-
-    if let Ok(mut receiver) = runtime.get_receiver() {
-
-        println!("Creating the receiver");
-
-        tokio::spawn(async move {
-            while let Ok(msg) = receiver.recv().await {
-
-                let out: SelectQuery = match from_bytes(&msg){
-                    Ok(v) => v,
-                    Err(e) => return
-                };
-
-                println!("here: {:?}", out);
-
-                // if let Ok(res) = String::from_utf8(msg) {
-                //     let res = res.trim_matches(char::from(0));
-
-                //     println!("{}: {:?}", res.len(), res);
-                // }
-                
-                
-            }
-        });
-    };
-
-
-
 
     // this is the command line
     while let Some(Ok(line)) = stdin.lock().lines().next() {
@@ -73,6 +47,7 @@ async fn main() -> io::Result<()> {
                     match select_query {
                         Ok(select) => match to_vec::<_, 32>(&select) {
                             Ok(result) => {
+                                println!("We are making a request");
                                 let cloned_messenger = messenger.clone();
                                 tokio::spawn(
                                     async move { cloned_messenger.write_all(result.to_vec()).await },

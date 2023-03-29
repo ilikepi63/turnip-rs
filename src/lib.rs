@@ -1,9 +1,4 @@
-use tokio::net::TcpStream;
+pub mod server;
+pub mod models;
+pub mod runtime;
 
-pub enum TcpStreamMessage {
-    Connect(String, TcpStream),
-    Disconnect(String),
-    Write(String, String),
-    Read(String, String),
-    WriteAll(String),
-}

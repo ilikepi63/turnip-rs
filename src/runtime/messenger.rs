@@ -1,5 +1,5 @@
+use crate::models::tcp_stream_message::TcpStreamMessage;
 use tokio::sync::mpsc;
-use turnip_rs::TcpStreamMessage;
 
 // use crate::TcpStreamMessage::{Connect, Disconnect, Read, Write};
 
@@ -9,15 +9,28 @@ pub struct TurnipMessenger {
 }
 
 impl TurnipMessenger {
-    pub fn new(tx: mpsc::Sender<TcpStreamMessage>) -> Self{
+    pub fn new(tx: mpsc::Sender<TcpStreamMessage>) -> Self {
         TurnipMessenger { tx: tx }
     }
 
-    pub fn write(addr: String, message: String) {}
+    pub async fn write(&self, addr: String, message: Vec<u8>) {
+        match self.tx.send(TcpStreamMessage::Write(addr, message)).await {
+            Ok(_r) => {}
+            Err(e) => {
+                eprintln!("Error with Writing: {:?}", e);
+            }
+        };
+    }
 
-    pub fn write_all(message: String) {}
+    pub async fn write_all(&self, message: Vec<u8>) {
+        match self.tx.send(TcpStreamMessage::WriteAll(message)).await {
+            Ok(_r) => {}
+            Err(e) => {
+                eprintln!("Error with Writing: {:?}", e);
+            }
+        };
+    }
 }
-
 
 unsafe impl Send for TurnipMessenger {}
 unsafe impl Sync for TurnipMessenger {}
