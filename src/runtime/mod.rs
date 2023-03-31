@@ -270,7 +270,7 @@ pub fn handle_connection(
                                 }
                             };
                         },
-                        Err(e) => {
+                        Err(_e) => {
                             eprintln!("Failed to write to the socket");
                         }
                     }
@@ -281,7 +281,7 @@ pub fn handle_connection(
                         Some(v) => {
                             println!("Received {:?}", v);
                             match socket.write_all(&v).await {
-                                Ok(v) => {
+                                Ok(_v) => {
 
                                 },
                                 Err(e) => {

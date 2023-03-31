@@ -1,3 +1,4 @@
+use db::data::Db;
 // this is going to be a Read-Eval-Print-Loop for turnip, which will work by putting in
 use models::insert_query::InsertQuery;
 use models::select_query::SelectQuery;
@@ -10,14 +11,18 @@ use sqlparser::{
     dialect::GenericDialect,
 };
 use std::io::{self, BufRead};
+use std::collections::HashMap;
 
 mod models;
 mod runtime;
 mod server;
+mod db;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
     let stdin = io::stdin();
+
+    let mut db = Db::new();
 
     // the runtime
     let mut runtime = TurnipRuntime::new("8080");
@@ -101,8 +106,17 @@ async fn main() -> io::Result<()> {
                     returning: _,
                 } => {
                     let insert_query = InsertQuery::try_from(statement);
-
+                    println!("{:?}",statement);
                     println!("Insert! {:?}", insert_query);
+
+                    if let Ok(query) = insert_query{
+                        db.insert(query);
+                    }
+
+                
+
+                    // println!("DB After insert: {:?}", db);
+                 
                     // with insert, we are only interested in sharing data with known nodes that are interested in it.
                 }
                 _ => {

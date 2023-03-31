@@ -27,3 +27,7 @@ path = "src/repl.rs"
 [[bin]]
 name = "two"
 path = "src/repl_two.rs"
+
+[[bin]]
+name = "test"
+path = "src/repl_test.rs"

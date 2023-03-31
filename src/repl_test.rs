@@ -20,17 +20,6 @@ mod db;
 async fn main() -> io::Result<()> {
     let stdin = io::stdin();
 
-    // the runtime
-    let mut runtime = TurnipRuntime::new("8082");
-
-    runtime.add_connections(vec!["127.0.0.1:8080".to_string()]);
-
-    runtime.run();
-
-    let messenger = runtime
-        .get_messenger()
-        .expect("Could not get the messenger from the runtime");
-
     // this is the command line
     while let Some(Ok(line)) = stdin.lock().lines().next() {
         let dialect = GenericDialect {};
@@ -45,23 +34,16 @@ async fn main() -> io::Result<()> {
                 Query(query) => {
                     let select_query = SelectQuery::try_from(&*query.body);
 
-                    match select_query {
-                        Ok(select) => match to_vec::<_, 32>(&select) {
-                            Ok(result) => {
-                                println!("We are making a request");
-                                let cloned_messenger = messenger.clone();
-                                tokio::spawn(
-                                    async move { cloned_messenger.write_all(result.to_vec()).await },
-                                );
-                            }
+                        match select_query {
+                            Ok(select) => {
+
+                                println!("{:?}",select);
+                         
+                            },
                             Err(e) => {
-                                eprintln!("An Error ocurred trying to serialize data: {:?}", e);
+                                eprintln!("Error with getting the Statement: {:?}", e);
                             }
-                        },
-                        Err(e) => {
-                            eprintln!("Error with getting the Statement: {:?}", e);
                         }
-                    }
                 }
                 Insert {
                     or: _,

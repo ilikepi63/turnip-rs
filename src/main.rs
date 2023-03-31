@@ -1,6 +1,12 @@
 use crate::runtime::TurnipRuntime;
 use std::error::Error;
 
+pub mod server;
+pub mod models;
+pub mod runtime;
+pub mod db;
+
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let mut runtime = TurnipRuntime::new("127.0.0.1:8080");

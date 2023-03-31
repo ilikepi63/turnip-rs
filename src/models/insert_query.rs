@@ -4,16 +4,43 @@ use sqlparser::ast::{
     Statement::{self, Insert},
     Values,
 };
+use crate::db::models::{number_value::NumberValueType, string_value::StringTypeValue};
+
+use crate::db::data::TypeValue; 
 
 use super::errors::StatementError;
 
-fn expr_to_string(i: &Expr) -> String {
+fn expr_to_value(i: &Expr) -> Option<TypeValue> {
     match i {
         Expr::Identifier(Ident {
             value,
-            quote_style: _,
-        }) => value.clone(),
-        _ => "".to_string(),
+            quote_style,
+        }) => match quote_style{
+            Some(_) => Some(TypeValue::StringTypeValue(StringTypeValue{value: value.to_string()})),
+            // todo: Also make a place for boolean values here
+            None => match value.parse::<f64>() {
+                Ok(v) => Some(TypeValue::NumberValueType(NumberValueType{value: v})),
+                Err(e) => {
+                    eprintln!("Error with parsing float: {value} error: {:?}", e);
+                    None
+                }
+            }
+        },
+        Expr::Value(value) => {
+            match value {
+                sqlparser::ast::Value::Number(s, _)=>{
+                    match s.parse::<f64>() {
+                        Ok(v) => Some(TypeValue::NumberValueType(NumberValueType{value: v})),
+                        Err(e) => {
+                            eprintln!("Error with parsing float: {value} error: {:?}", e);
+                            None
+                        }
+                    }
+                },
+                _ => None
+            }
+        }
+        _ => None,
     }
 }
 
@@ -21,7 +48,7 @@ fn expr_to_string(i: &Expr) -> String {
 pub struct InsertQuery {
     pub table_name: String,
     pub columns: Vec<String>,
-    pub rows: Vec<Vec<String>>,
+    pub rows: Vec<Vec<Option<TypeValue>>>,
 }
 
 impl TryFrom<&Statement> for InsertQuery {
@@ -48,7 +75,7 @@ impl TryFrom<&Statement> for InsertQuery {
                     rows,
                 }) => Ok(rows
                     .iter()
-                    .map(|row| row.iter().map(|v| expr_to_string(v)).collect())
+                    .map(|row| row.iter().map(|v| expr_to_value(v)).collect())
                     .collect()),
                 _ => Err(StatementError::NotImplementedError()),
             }?;
