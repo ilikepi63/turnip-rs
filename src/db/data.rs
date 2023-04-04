@@ -6,8 +6,8 @@ use super::errors::DatabaseError;
 use crate::models::select_query::SelectQuery;
 use crate::{db::errors::ValueParseError, models::insert_query::InsertQuery};
 
-use std::collections::HashMap;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 
 use super::models::{number_value::NumberValueType, string_value::StringTypeValue};
 
@@ -31,10 +31,14 @@ impl TryFrom<&Value> for TypeValue {
                 }
             },
             sqlparser::ast::Value::DoubleQuotedString(s) => {
-                Ok(TypeValue::StringTypeValue(StringTypeValue { value: s.to_string() }))
+                Ok(TypeValue::StringTypeValue(StringTypeValue {
+                    value: s.to_string(),
+                }))
             }
             sqlparser::ast::Value::SingleQuotedString(s) => {
-                Ok(TypeValue::StringTypeValue(StringTypeValue { value: s.to_string() }))
+                Ok(TypeValue::StringTypeValue(StringTypeValue {
+                    value: s.to_string(),
+                }))
             }
             _ => Err(ValueParseError::IsNoneError()),
         }

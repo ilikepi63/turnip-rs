@@ -1,4 +1,4 @@
-use sqlparser::{ast::Expr, parser::ParserError};
+use sqlparser::parser::ParserError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]

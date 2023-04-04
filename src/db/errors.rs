@@ -1,5 +1,5 @@
-use thiserror::Error;
 use sqlparser::ast::Expr;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {
