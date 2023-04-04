@@ -105,7 +105,7 @@ impl TurnipRuntime {
                         // sending a metadata request(like other ip addresses in the landscape) or
                         // are making a query(either telling us about an insert or a giving us a select)
                         match broadcast_tx_clone.send(msg) {
-                            Ok(_) => {}
+                            Ok(_) => {},
                             Err(e) => {
                                 eprintln!("Errror with broadcasting the read: {:?}", e)
                             }
@@ -202,7 +202,7 @@ impl TurnipRuntime {
                         // sending a metadata request(like other ip addresses in the landscape) or
                         // are making a query(either telling us about an insert or a giving us a select)
                         match broadcast_tx_clone.send(msg) {
-                            Ok(_) => {}
+                            Ok(_) => {},
                             Err(e) => {
                                 eprintln!("Errror with broadcasting the read: {:?}", e)
                             }

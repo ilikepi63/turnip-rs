@@ -46,7 +46,7 @@ async fn main() -> io::Result<()> {
                     let select_query = SelectQuery::try_from(&*query.body);
 
                     match select_query {
-                        Ok(select) => match to_vec::<_, 32>(&select) {
+                        Ok(select) => match to_vec::<_, 1048>(&select) {
                             Ok(result) => {
                                 println!("We are making a request");
                                 let cloned_messenger = messenger.clone();

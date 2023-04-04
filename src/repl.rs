@@ -38,6 +38,9 @@ async fn main() -> io::Result<()> {
 
         tokio::spawn(async move {
             while let Ok(msg) = receiver.recv().await {
+
+                println!("Invoking this");
+
                 let out: SelectQuery = match from_bytes(&msg) {
                     Ok(v) => v,
                     Err(e) => return,
