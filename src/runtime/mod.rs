@@ -169,7 +169,7 @@ impl TurnipRuntime {
             for addr in connections.iter() {
                 if let Ok(socket) = TcpStream::connect(addr).await {
                     handle_connection(&mut stream_map, socket, addr.clone(), thread_tx.clone());
-                }   
+                }
             }
 
             while let Some(msg) = rx1.recv().await {
@@ -235,13 +235,12 @@ pub fn handle_connection(
 
     let address = addr.clone();
 
-    let (tx,mut rx) = mpsc::channel::<Vec<u8>>(16);
+    let (tx, mut rx) = mpsc::channel::<Vec<u8>>(16);
 
     let handle = tokio::spawn(async move {
-
         let mut buf = vec![0; 1024];
 
-        loop{
+        loop {
             select! {
                 // we have received something from the socket
                 val = socket.read(&mut buf) => {
@@ -307,17 +306,14 @@ pub async fn write_to_all(
     stream_map: &mut HashMap<String, (mpsc::Sender<Vec<u8>>, JoinHandle<()>)>,
     msg: Vec<u8>,
 ) {
-
-    let keys:Vec<String> = stream_map.keys().map(|v| v.to_string()).collect();
+    let keys: Vec<String> = stream_map.keys().map(|v| v.to_string()).collect();
 
     println!("here are the keys: {:?}", keys);
 
     for key in keys {
-
         println!("Sending to {key}");
 
         if let Some((socket, _)) = stream_map.get_mut(&key) {
-
             // TODO: error handling here
             match socket.send(msg.clone()).await {
                 Ok(_r) => {}
@@ -325,7 +321,7 @@ pub async fn write_to_all(
                     eprintln!("Error with Writing all: {:?}", e);
                 }
             };
-        }else{
+        } else {
             println!("Failed to get the addr from socket");
         }
     }
@@ -337,7 +333,6 @@ pub async fn write(
     msg: Vec<u8>,
 ) {
     if let Some((tx, _)) = stream_map.get_mut(&key) {
-
         // TODO: error handling here
         match tx.send(msg).await {
             Ok(_r) => {}

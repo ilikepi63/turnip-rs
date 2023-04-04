@@ -1,18 +1,77 @@
 // this is the in-memory(for now) DB for holding local data in the node
 use serde::{Deserialize, Serialize};
+use sqlparser::ast::Value;
 
 use super::errors::DatabaseError;
-use crate::models::insert_query::InsertQuery;
 use crate::models::select_query::SelectQuery;
+use crate::{db::errors::ValueParseError, models::insert_query::InsertQuery};
+
 use std::collections::HashMap;
+use std::cmp::Ordering;
 
 use super::models::{number_value::NumberValueType, string_value::StringTypeValue};
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TypeValue {
     StringTypeValue(StringTypeValue),
     NumberValueType(NumberValueType),
     NullValueType,
+}
+
+impl TryFrom<&Value> for TypeValue {
+    type Error = ValueParseError;
+
+    fn try_from(v: &Value) -> Result<Self, Self::Error> {
+        match v {
+            sqlparser::ast::Value::Number(s, _) => match s.parse::<f64>() {
+                Ok(v) => Ok(TypeValue::NumberValueType(NumberValueType { value: v })),
+                Err(e) => {
+                    eprintln!("Error with parsing float: {v} error: {:?}", e);
+                    Err(ValueParseError::IsNoneError())
+                }
+            },
+            sqlparser::ast::Value::DoubleQuotedString(s) => {
+                Ok(TypeValue::StringTypeValue(StringTypeValue { value: s.to_string() }))
+            }
+            sqlparser::ast::Value::SingleQuotedString(s) => {
+                Ok(TypeValue::StringTypeValue(StringTypeValue { value: s.to_string() }))
+            }
+            _ => Err(ValueParseError::IsNoneError()),
+        }
+    }
+}
+
+impl PartialEq for TypeValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (
+                &TypeValue::StringTypeValue(StringTypeValue { value: ref a }),
+                &TypeValue::StringTypeValue(StringTypeValue { value: ref b }),
+            ) => a == b,
+            (
+                &TypeValue::NumberValueType(NumberValueType { value: ref a }),
+                &TypeValue::NumberValueType(NumberValueType { value: ref b }),
+            ) => a == b,
+            (&TypeValue::NullValueType, &TypeValue::NullValueType) => true,
+            _ => false,
+        }
+    }
+}
+
+impl PartialOrd for TypeValue {
+    fn partial_cmp(&self, other: &TypeValue) -> Option<Ordering> {
+        match (self, other) {
+            (
+                &TypeValue::StringTypeValue(StringTypeValue { value: ref a }),
+                &TypeValue::StringTypeValue(StringTypeValue { value: ref b }),
+            ) => Some(a.cmp(b)),
+            (
+                &TypeValue::NumberValueType(NumberValueType { value: ref a }),
+                &TypeValue::NumberValueType(NumberValueType { value: ref b }),
+            ) => a.partial_cmp(b),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -32,11 +91,11 @@ pub struct Db {
 }
 
 impl Db {
-    pub fn new() -> Self{
-        Db{
-            data: HashMap::new()
+    pub fn new() -> Self {
+        Db {
+            data: HashMap::new(),
         }
-    } 
+    }
 
     pub fn query_data_by_select(query: SelectQuery) -> Vec<HashMap<String, TypeValue>> {
         // this shoud return a result from the DB depending on whether or not the query resulted in a data structure
@@ -71,7 +130,7 @@ impl Db {
                     }
                 };
 
-                self.data.insert(query.table_name.to_string(),table );
+                self.data.insert(query.table_name.to_string(), table);
 
                 Ok(())
             }

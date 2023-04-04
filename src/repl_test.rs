@@ -11,10 +11,10 @@ use sqlparser::{
 };
 use std::io::{self, BufRead};
 
+mod db;
 mod models;
 mod runtime;
 mod server;
-mod db;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -34,16 +34,14 @@ async fn main() -> io::Result<()> {
                 Query(query) => {
                     let select_query = SelectQuery::try_from(&*query.body);
 
-                        match select_query {
-                            Ok(select) => {
-
-                                println!("{:?}",select);
-                         
-                            },
-                            Err(e) => {
-                                eprintln!("Error with getting the Statement: {:?}", e);
-                            }
+                    match select_query {
+                        Ok(select) => {
+                            println!("{:?}", select);
                         }
+                        Err(e) => {
+                            eprintln!("Error with getting the Statement: {:?}", e);
+                        }
+                    }
                 }
                 Insert {
                     or: _,

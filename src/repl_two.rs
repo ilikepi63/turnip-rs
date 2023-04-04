@@ -11,10 +11,10 @@ use sqlparser::{
 };
 use std::io::{self, BufRead};
 
+mod db;
 mod models;
 mod runtime;
 mod server;
-mod db;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -50,9 +50,9 @@ async fn main() -> io::Result<()> {
                             Ok(result) => {
                                 println!("We are making a request");
                                 let cloned_messenger = messenger.clone();
-                                tokio::spawn(
-                                    async move { cloned_messenger.write_all(result.to_vec()).await },
-                                );
+                                tokio::spawn(async move {
+                                    cloned_messenger.write_all(result.to_vec()).await
+                                });
                             }
                             Err(e) => {
                                 eprintln!("An Error ocurred trying to serialize data: {:?}", e);

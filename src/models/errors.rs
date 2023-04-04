@@ -1,7 +1,7 @@
-use sqlparser::parser::ParserError;
+use sqlparser::{ast::Expr, parser::ParserError};
 use thiserror::Error;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum StatementError {
     #[error("Could not correctly parse the query.")]
     ParserError(#[from] ParserError),
@@ -14,4 +14,13 @@ pub enum StatementError {
 
     #[error("No `into` parameter specified for Select Query. Each Select needs to have an into parameter specified.")]
     NoIntoSpecifiedForSelect(),
+}
+
+#[derive(Error, Debug, PartialEq)]
+pub enum SelectQueryError {
+    #[error("No Select query is present.")]
+    IsNoneError(),
+
+    #[error("Expression is not supported")]
+    IsNotSupportedError(),
 }

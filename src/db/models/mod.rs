@@ -1,2 +1,2 @@
-pub mod string_value;
 pub mod number_value;
+pub mod string_value;

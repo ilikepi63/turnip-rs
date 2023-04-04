@@ -4,19 +4,19 @@ use models::insert_query::InsertQuery;
 use models::select_query::SelectQuery;
 use runtime::TurnipRuntime;
 
-use postcard::{to_vec, from_bytes};
+use postcard::{from_bytes, to_vec};
 use sqlparser::parser::Parser;
 use sqlparser::{
     ast::Statement::{Insert, Query},
     dialect::GenericDialect,
 };
-use std::io::{self, BufRead};
 use std::collections::HashMap;
+use std::io::{self, BufRead};
 
+mod db;
 mod models;
 mod runtime;
 mod server;
-mod db;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -34,15 +34,13 @@ async fn main() -> io::Result<()> {
         .expect("Could not get the messenger from the runtime");
 
     if let Ok(mut receiver) = runtime.get_receiver() {
-
         println!("Creating the receiver");
 
         tokio::spawn(async move {
             while let Ok(msg) = receiver.recv().await {
-
-                let out: SelectQuery = match from_bytes(&msg){
+                let out: SelectQuery = match from_bytes(&msg) {
                     Ok(v) => v,
-                    Err(e) => return
+                    Err(e) => return,
                 };
 
                 println!("here: {:?}", out);
@@ -52,14 +50,9 @@ async fn main() -> io::Result<()> {
 
                 //     println!("{}: {:?}", res.len(), res);
                 // }
-                
-                
             }
         });
     };
-
-
-
 
     // this is the command line
     while let Some(Ok(line)) = stdin.lock().lines().next() {
@@ -79,9 +72,9 @@ async fn main() -> io::Result<()> {
                         Ok(select) => match to_vec::<_, 32>(&select) {
                             Ok(result) => {
                                 let cloned_messenger = messenger.clone();
-                                tokio::spawn(
-                                    async move { cloned_messenger.write_all(result.to_vec()).await },
-                                );
+                                tokio::spawn(async move {
+                                    cloned_messenger.write_all(result.to_vec()).await
+                                });
                             }
                             Err(e) => {
                                 eprintln!("An Error ocurred trying to serialize data: {:?}", e);
@@ -106,18 +99,10 @@ async fn main() -> io::Result<()> {
                     returning: _,
                 } => {
                     let insert_query = InsertQuery::try_from(statement);
-                    println!("{:?}",statement);
-                    println!("Insert! {:?}", insert_query);
 
-                    if let Ok(query) = insert_query{
+                    if let Ok(query) = insert_query {
                         db.insert(query);
                     }
-
-                
-
-                    // println!("DB After insert: {:?}", db);
-                 
-                    // with insert, we are only interested in sharing data with known nodes that are interested in it.
                 }
                 _ => {
                     println!("Found something else");
