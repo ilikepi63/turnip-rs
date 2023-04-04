@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     loop {
         sleep(Duration::from_millis(1000)).await;
-        let result = stream.write_all(b"hello world\n").await;
+        let _result = stream.write_all(b"hello world\n").await;
     }
 
     Ok(())

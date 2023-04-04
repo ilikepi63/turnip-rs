@@ -1,16 +1,16 @@
-use crate::db::data::TypeValue;
+
 use serde::{Deserialize, Serialize};
-use sqlparser::ast::Statement::{Insert, Query};
+
 use sqlparser::ast::{
-    BinaryOperator, Expr, SelectItem,
+    SelectItem,
     SetExpr::{self, Select},
     TableFactor,
 };
-use sqlparser::dialect::GenericDialect;
-use sqlparser::parser::Parser;
-use std::collections::HashMap;
 
-use super::errors::{SelectQueryError, StatementError};
+
+
+
+use super::errors::{StatementError};
 use super::expression::Expression;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,14 +76,14 @@ impl TryFrom<&SetExpr> for SelectQuery {
                 None => None,
             };
 
-            return Ok(SelectQuery {
+            Ok(SelectQuery {
                 into,
-                projection: projection,
+                projection,
                 from,
                 constraints,
-            });
+            })
         } else {
-            return Err(StatementError::NotImplementedError());
+            Err(StatementError::NotImplementedError())
         }
     }
 }

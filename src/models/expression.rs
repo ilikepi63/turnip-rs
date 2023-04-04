@@ -1,16 +1,15 @@
 use crate::db::data::TypeValue;
 use crate::db::models::number_value::NumberValueType;
 use crate::db::models::string_value::StringTypeValue;
-use crate::models::select_query::SelectQuery;
+
 use serde::{Deserialize, Serialize};
-use sqlparser::ast::Statement::Query;
+
 use sqlparser::ast::{
-    BinaryOperator, Expr, Ident, SetExpr,
-    Statement::{self, Insert},
-    Value, Values,
+    BinaryOperator, Expr,
+    Value,
 };
-use sqlparser::dialect::GenericDialect;
-use sqlparser::parser::Parser;
+
+
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use thiserror::Error;
@@ -61,22 +60,22 @@ impl Expression {
             Expression::BinaryOp(left, right, op) => {
                 match op {
                     ExpressionBinaryOperator::Gt => {
-                        compare(&*left, &*right, |tv1, tv2| tv1 > tv2, values)
+                        compare(left, right, |tv1, tv2| tv1 > tv2, values)
                     }
                     ExpressionBinaryOperator::Lt => {
-                        compare(&*left, &*right, |tv1, tv2| tv1 < tv2, values)
+                        compare(left, right, |tv1, tv2| tv1 < tv2, values)
                     }
                     ExpressionBinaryOperator::GtEq => {
-                        compare(&*left, &*right, |tv1, tv2| tv1 >= tv2, values)
+                        compare(left, right, |tv1, tv2| tv1 >= tv2, values)
                     }
                     ExpressionBinaryOperator::LtEq => {
-                        compare(&*left, &*right, |tv1, tv2| tv1 <= tv2, values)
+                        compare(left, right, |tv1, tv2| tv1 <= tv2, values)
                     }
                     ExpressionBinaryOperator::Eq => {
-                        compare(&*left, &*right, |tv1, tv2| tv1 == tv2, values)
+                        compare(left, right, |tv1, tv2| tv1 == tv2, values)
                     }
                     ExpressionBinaryOperator::NotEq => {
-                        compare(&*left, &*right, |tv1, tv2| tv1 != tv2, values)
+                        compare(left, right, |tv1, tv2| tv1 != tv2, values)
                     }
 
                     // compounds
@@ -207,7 +206,7 @@ impl TryInto<TypeValue> for ExpressionValue {
                 }
             },
             ExpressionValue::String(s) => Ok(TypeValue::StringTypeValue(StringTypeValue {
-                value: s.to_string(),
+                value: s,
             })),
             _ => Err(ExpressionEvaluationError::StandardError()),
         }

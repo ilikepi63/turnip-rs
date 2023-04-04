@@ -12,7 +12,7 @@ pub struct SelectIndex {
 
 impl SelectIndex {
     // access pattern to get all the addresses subscribed to a
-    pub fn get_addr_for_insert(insert_query: InsertQuery) -> Result<Vec<String>, Box<dyn Error>> {
+    pub fn get_addr_for_insert(_insert_query: InsertQuery) -> Result<Vec<String>, Box<dyn Error>> {
         Ok(vec![])
     }
 

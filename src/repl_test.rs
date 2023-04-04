@@ -1,9 +1,9 @@
 // this is going to be a Read-Eval-Print-Loop for turnip, which will work by putting in
 use models::insert_query::InsertQuery;
 use models::select_query::SelectQuery;
-use runtime::TurnipRuntime;
 
-use postcard::to_vec;
+
+
 use sqlparser::parser::Parser;
 use sqlparser::{
     ast::Statement::{Insert, Query},

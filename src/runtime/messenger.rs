@@ -10,7 +10,7 @@ pub struct TurnipMessenger {
 
 impl TurnipMessenger {
     pub fn new(tx: mpsc::Sender<TcpStreamMessage>) -> Self {
-        TurnipMessenger { tx: tx }
+        TurnipMessenger { tx }
     }
 
     pub async fn write(&self, addr: String, message: Vec<u8>) {

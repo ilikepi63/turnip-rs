@@ -70,21 +70,21 @@ impl TryFrom<&Statement> for InsertQuery {
                     rows,
                 }) => Ok(rows
                     .iter()
-                    .map(|row| row.iter().map(|v| expr_to_value(v)).collect())
+                    .map(|row| row.iter().map(expr_to_value).collect())
                     .collect()),
                 _ => Err(StatementError::NotImplementedError()),
             }?;
 
             let columns: Vec<String> = columns.iter().map(|i| i.value.clone()).collect();
 
-            return Ok(InsertQuery {
+            Ok(InsertQuery {
                 table_name: match table_name.0.first() {
                     Some(v) => Ok(v.value.clone()),
                     None => Err(StatementError::NotImplementedError()),
                 }?,
                 columns,
                 rows,
-            });
+            })
         } else {
             Err(StatementError::NotImplementedError())
         }

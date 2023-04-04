@@ -10,7 +10,7 @@ use sqlparser::{
     ast::Statement::{Insert, Query},
     dialect::GenericDialect,
 };
-use std::collections::HashMap;
+
 use std::io::{self, BufRead};
 
 mod db;
@@ -43,7 +43,7 @@ async fn main() -> io::Result<()> {
 
                 let out: SelectQuery = match from_bytes(&msg) {
                     Ok(v) => v,
-                    Err(e) => return,
+                    Err(_e) => return,
                 };
 
                 println!("here: {:?}", out);

@@ -46,7 +46,7 @@ impl TurnipRuntime {
         self.tx.is_some()
     }
 
-    pub fn run(&mut self) -> () {
+    pub fn run(&mut self) {
         // TODO: think about capacity below
         let (broadcast_tx, _) = broadcast::channel::<Vec<u8>>(16);
 
@@ -141,13 +141,13 @@ impl TurnipRuntime {
 
     pub fn get_receiver(&mut self) -> Result<broadcast::Receiver<Vec<u8>>, TurnipRuntimeError> {
         if let Some(tx) = self.broadcast_tx.as_ref() {
-            return Ok(tx.subscribe());
+            Ok(tx.subscribe())
         } else {
-            return Err(TurnipRuntimeError::NotIntializedError());
+            Err(TurnipRuntimeError::NotIntializedError())
         }
     }
 
-    pub async fn run_blocking(&mut self) -> () {
+    pub async fn run_blocking(&mut self) {
         let (broadcast_tx, _) = broadcast::channel::<Vec<u8>>(16);
 
         let broadcast_tx_clone = broadcast_tx.clone();
@@ -231,7 +231,7 @@ pub fn handle_connection(
     addr: String,
     tx: mpsc::Sender<TcpStreamMessage>,
 ) {
-    let reader_tx = tx.clone();
+    let reader_tx = tx;
 
     let address = addr.clone();
 
@@ -299,7 +299,7 @@ pub fn handle_connection(
         }
     });
 
-    stream_map.insert(addr, (tx.clone(), handle));
+    stream_map.insert(addr, (tx, handle));
 }
 
 pub async fn write_to_all(

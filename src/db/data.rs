@@ -101,7 +101,7 @@ impl Db {
         }
     }
 
-    pub fn query_data_by_select(query: SelectQuery) -> Vec<HashMap<String, TypeValue>> {
+    pub fn query_data_by_select(_query: SelectQuery) -> Vec<HashMap<String, TypeValue>> {
         // this shoud return a result from the DB depending on whether or not the query resulted in a data structure
         vec![]
     }
