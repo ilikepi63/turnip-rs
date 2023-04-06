@@ -11,12 +11,15 @@ use sqlparser::{
     dialect::GenericDialect,
 };
 
+use messaging::Message;
+
 use std::io::{self, BufRead};
 
 mod db;
 mod models;
 mod runtime;
 mod server;
+mod messaging;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -41,18 +44,17 @@ async fn main() -> io::Result<()> {
 
                 println!("Invoking this");
 
-                let out: SelectQuery = match from_bytes(&msg) {
-                    Ok(v) => v,
+                let m: Message = match from_bytes(&msg) {
+                    Ok(m) => m,
                     Err(_e) => return,
                 };
 
+                let out = match m {
+                    Message::Select(select) => select,
+                    _ => return
+                };
+
                 println!("here: {:?}", out);
-
-                // if let Ok(res) = String::from_utf8(msg) {
-                //     let res = res.trim_matches(char::from(0));
-
-                //     println!("{}: {:?}", res.len(), res);
-                // }
             }
         });
     };
@@ -72,8 +74,10 @@ async fn main() -> io::Result<()> {
                     let select_query = SelectQuery::try_from(&*query.body);
 
                     match select_query {
-                        Ok(select) => match to_vec::<_, 32>(&select) {
+                        Ok(select) => match to_vec::<_, 32>(&Message::Select(select)) {
                             Ok(result) => {
+
+                                // Writes the 
                                 let cloned_messenger = messenger.clone();
                                 tokio::spawn(async move {
                                     cloned_messenger.write_all(result.to_vec()).await

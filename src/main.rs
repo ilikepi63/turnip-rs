@@ -5,6 +5,7 @@ pub mod db;
 pub mod models;
 pub mod runtime;
 pub mod server;
+pub mod messaging;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

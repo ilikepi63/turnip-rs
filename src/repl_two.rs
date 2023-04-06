@@ -11,10 +11,13 @@ use sqlparser::{
 };
 use std::io::{self, BufRead};
 
+use messaging::Message;
+
 mod db;
 mod models;
 mod runtime;
 mod server;
+mod messaging;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -46,7 +49,7 @@ async fn main() -> io::Result<()> {
                     let select_query = SelectQuery::try_from(&*query.body);
 
                     match select_query {
-                        Ok(select) => match to_vec::<_, 1048>(&select) {
+                        Ok(select) => match to_vec::<_, 1048>(&Message::Select(select)) {
                             Ok(result) => {
                                 println!("We are making a request");
                                 let cloned_messenger = messenger.clone();

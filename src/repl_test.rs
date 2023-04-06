@@ -15,6 +15,7 @@ mod db;
 mod models;
 mod runtime;
 mod server;
+mod messaging;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
