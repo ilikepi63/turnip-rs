@@ -16,10 +16,10 @@ use messaging::Message;
 use std::io::{self, BufRead};
 
 mod db;
+mod messaging;
 mod models;
 mod runtime;
 mod server;
-mod messaging;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -41,7 +41,6 @@ async fn main() -> io::Result<()> {
 
         tokio::spawn(async move {
             while let Ok(msg) = receiver.recv().await {
-
                 println!("Invoking this");
 
                 let m: Message = match from_bytes(&msg) {
@@ -51,7 +50,7 @@ async fn main() -> io::Result<()> {
 
                 let out = match m {
                     Message::Select(select) => select,
-                    _ => return
+                    _ => return,
                 };
 
                 println!("here: {:?}", out);
@@ -76,8 +75,7 @@ async fn main() -> io::Result<()> {
                     match select_query {
                         Ok(select) => match to_vec::<_, 32>(&Message::Select(select)) {
                             Ok(result) => {
-
-                                // Writes the 
+                                // Writes the
                                 let cloned_messenger = messenger.clone();
                                 tokio::spawn(async move {
                                     cloned_messenger.write_all(result.to_vec()).await

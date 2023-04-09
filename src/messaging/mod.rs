@@ -1,10 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-
-use crate::models::{select_query::SelectQuery, insert_query::InsertQuery};
+use crate::models::{insert_query::InsertQuery, select_query::SelectQuery};
 
 #[derive(Deserialize, Serialize)]
-pub enum Message{
+pub enum Message {
     Select(SelectQuery),
-    Insert(InsertQuery)
+    Insert(InsertQuery),
 }

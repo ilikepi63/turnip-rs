@@ -2,8 +2,6 @@
 use models::insert_query::InsertQuery;
 use models::select_query::SelectQuery;
 
-
-
 use sqlparser::parser::Parser;
 use sqlparser::{
     ast::Statement::{Insert, Query},
@@ -12,10 +10,10 @@ use sqlparser::{
 use std::io::{self, BufRead};
 
 mod db;
+mod messaging;
 mod models;
 mod runtime;
 mod server;
-mod messaging;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {

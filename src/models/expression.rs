@@ -4,11 +4,7 @@ use crate::db::models::string_value::StringTypeValue;
 
 use serde::{Deserialize, Serialize};
 
-use sqlparser::ast::{
-    BinaryOperator, Expr,
-    Value,
-};
-
+use sqlparser::ast::{BinaryOperator, Expr, Value};
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -44,9 +40,9 @@ pub fn compare(
 ) -> Result<bool, ExpressionEvaluationError> {
     match (left.resolve(values), right.resolve(values)) {
         (Ok(tv1), Ok(tv2)) => {
-            println!("Comparing!: {:?} {:?}", tv1, tv2);   
+            println!("Comparing!: {:?} {:?}", tv1, tv2);
             Ok(eval(tv1, tv2))
-        },
+        }
         _ => Err(ExpressionEvaluationError::StandardError()),
     }
 }
@@ -151,20 +147,22 @@ impl TryFrom<&Expr> for Expression {
                     }
                 },
             ),
-            Expr::Identifier(i) => Expression::Identifier(ExpressionIdentifier { value: i.value.to_string() }),
+            Expr::Identifier(i) => Expression::Identifier(ExpressionIdentifier {
+                value: i.value.to_string(),
+            }),
             Expr::Value(value) => Expression::Value(match value {
-                Value::Number(s, _) => ExpressionValue::Number(s.to_string() ),
-                Value::SingleQuotedString(s) => ExpressionValue::String(s.to_string() ),
-                Value::DollarQuotedString(s) => ExpressionValue::String(s.value.to_string() ),
-                Value::EscapedStringLiteral(s) => ExpressionValue::String(s.to_string() ),
+                Value::Number(s, _) => ExpressionValue::Number(s.to_string()),
+                Value::SingleQuotedString(s) => ExpressionValue::String(s.to_string()),
+                Value::DollarQuotedString(s) => ExpressionValue::String(s.value.to_string()),
+                Value::EscapedStringLiteral(s) => ExpressionValue::String(s.to_string()),
 
-                Value::SingleQuotedByteStringLiteral(s) => ExpressionValue::String(s.to_string() ),
-                Value::DoubleQuotedByteStringLiteral(s) => ExpressionValue::String(s.to_string() ),
-                Value::RawStringLiteral(s) => ExpressionValue::String(s.to_string() ),
+                Value::SingleQuotedByteStringLiteral(s) => ExpressionValue::String(s.to_string()),
+                Value::DoubleQuotedByteStringLiteral(s) => ExpressionValue::String(s.to_string()),
+                Value::RawStringLiteral(s) => ExpressionValue::String(s.to_string()),
 
-                Value::NationalStringLiteral(s) => ExpressionValue::String(s.to_string() ),
-                Value::HexStringLiteral(s) => ExpressionValue::String(s.to_string() ),
-                Value::DoubleQuotedString(s) => ExpressionValue::String(s.to_string() ),
+                Value::NationalStringLiteral(s) => ExpressionValue::String(s.to_string()),
+                Value::HexStringLiteral(s) => ExpressionValue::String(s.to_string()),
+                Value::DoubleQuotedString(s) => ExpressionValue::String(s.to_string()),
                 _ => {
                     eprintln!("Error found at Converting value expression: {:?}", value);
                     return Err(ExpressionConversionError::StandardError());
@@ -205,9 +203,9 @@ impl TryInto<TypeValue> for ExpressionValue {
                     Err(ExpressionEvaluationError::StandardError())
                 }
             },
-            ExpressionValue::String(s) => Ok(TypeValue::StringTypeValue(StringTypeValue {
-                value: s,
-            })),
+            ExpressionValue::String(s) => {
+                Ok(TypeValue::StringTypeValue(StringTypeValue { value: s }))
+            }
             _ => Err(ExpressionEvaluationError::StandardError()),
         }
     }
@@ -256,14 +254,18 @@ mod tests {
                                 Box::new(Expression::Identifier(ExpressionIdentifier {
                                     value: "x".to_string(),
                                 })),
-                                Box::new(Expression::Value(ExpressionValue::Number("1".to_string()))),
+                                Box::new(Expression::Value(ExpressionValue::Number(
+                                    "1".to_string(),
+                                ))),
                                 ExpressionBinaryOperator::Eq,
                             )),
                             Box::new(Expression::BinaryOp(
                                 Box::new(Expression::Identifier(ExpressionIdentifier {
                                     value: "u".to_string(),
                                 })),
-                                Box::new(Expression::Value(ExpressionValue::Number("2".to_string()))),
+                                Box::new(Expression::Value(ExpressionValue::Number(
+                                    "2".to_string(),
+                                ))),
                                 ExpressionBinaryOperator::Eq,
                             )),
                             ExpressionBinaryOperator::And,
@@ -323,7 +325,13 @@ mod tests {
                     ]);
 
                     match select_query {
-                        Ok(select) => assert_eq!(select.constraints.expect("No Constraints").evaluate(&values), Ok(true)),
+                        Ok(select) => assert_eq!(
+                            select
+                                .constraints
+                                .expect("No Constraints")
+                                .evaluate(&values),
+                            Ok(true)
+                        ),
                         Err(e) => {
                             eprintln!("Error with getting the Statement: {:?}", e);
                             panic!("No Select Statement found.")
@@ -360,7 +368,13 @@ mod tests {
                     ]);
 
                     match select_query {
-                        Ok(select) => assert_eq!(select.constraints.expect("No Constraints").evaluate(&values), Ok(false)),
+                        Ok(select) => assert_eq!(
+                            select
+                                .constraints
+                                .expect("No Constraints")
+                                .evaluate(&values),
+                            Ok(false)
+                        ),
                         Err(e) => {
                             eprintln!("Error with getting the Statement: {:?}", e);
                             panic!("No Select Statement found.")
@@ -401,7 +415,13 @@ mod tests {
                     ]);
 
                     match select_query {
-                        Ok(select) => assert_eq!(select.constraints.expect("No Constraints").evaluate(&values), Ok(true)),
+                        Ok(select) => assert_eq!(
+                            select
+                                .constraints
+                                .expect("No Constraints")
+                                .evaluate(&values),
+                            Ok(true)
+                        ),
                         Err(e) => {
                             eprintln!("Error with getting the Statement: {:?}", e);
                             panic!("No Select Statement found.")
@@ -442,7 +462,13 @@ mod tests {
                     ]);
 
                     match select_query {
-                        Ok(select) => assert_eq!(select.constraints.expect("No Constraints").evaluate(&values), Ok(false)),
+                        Ok(select) => assert_eq!(
+                            select
+                                .constraints
+                                .expect("No Constraints")
+                                .evaluate(&values),
+                            Ok(false)
+                        ),
                         Err(e) => {
                             eprintln!("Error with getting the Statement: {:?}", e);
                             panic!("No Select Statement found.")

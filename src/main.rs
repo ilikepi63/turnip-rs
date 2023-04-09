@@ -2,10 +2,10 @@ use crate::runtime::TurnipRuntime;
 use std::error::Error;
 
 pub mod db;
+pub mod messaging;
 pub mod models;
 pub mod runtime;
 pub mod server;
-pub mod messaging;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

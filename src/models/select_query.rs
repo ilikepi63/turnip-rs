@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 
 use sqlparser::ast::{
@@ -7,10 +6,7 @@ use sqlparser::ast::{
     TableFactor,
 };
 
-
-
-
-use super::errors::{StatementError};
+use super::errors::StatementError;
 use super::expression::Expression;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,9 +65,9 @@ impl TryFrom<&SetExpr> for SelectQuery {
             }?;
 
             let constraints = match &select.selection {
-                Some(r) => match Expression::try_from(r){
+                Some(r) => match Expression::try_from(r) {
                     Ok(result) => Some(result),
-                    Err(_) => None
+                    Err(_) => None,
                 },
                 None => None,
             };
