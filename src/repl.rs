@@ -30,6 +30,9 @@ async fn main() -> io::Result<()> {
     // the runtime
     let mut runtime = TurnipRuntime::new("8080");
 
+    // select index
+    // let mut select_index_sender = create_select_index().expect("Could not start the select index.");
+
     runtime.run();
 
     let messenger = runtime
@@ -37,11 +40,8 @@ async fn main() -> io::Result<()> {
         .expect("Could not get the messenger from the runtime");
 
     if let Ok(mut receiver) = runtime.get_receiver() {
-        println!("Creating the receiver");
-
         tokio::spawn(async move {
             while let Ok(msg) = receiver.recv().await {
-                println!("Invoking this");
 
                 let m: Message = match from_bytes(&msg) {
                     Ok(m) => m,
@@ -49,7 +49,11 @@ async fn main() -> io::Result<()> {
                 };
 
                 let out = match m {
-                    Message::Select(select) => select,
+                    Message::Select(select) => {
+
+
+
+                    },
                     _ => return,
                 };
 

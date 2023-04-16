@@ -1,5 +1,5 @@
 // this file will hold all of the selects that have been made by other nodes
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::mpsc::Sender};
 use std::error::Error;
 
 use crate::models::{
@@ -8,6 +8,27 @@ use crate::models::{
 };
 
 use super::data::convert_row_to_hashmap;
+
+// pub struct SelectIndexMessage{
+//     pub query: SelectQuery,
+//     pub address: String
+// }
+
+// pub fn create_select_index() -> Result<mpsc::Sender<SelectIndexMessage>, Box<dyn Error>>{
+
+//     let (tx, mut rx) = mpsc::channel::<SelectIndexMessage>(100);
+
+//     tokio::spawn(async move {
+
+//         let index = SelectIndex::new();
+
+//         while let Some(message) = rx.recv().await {
+//             index.insert_select(message.address, message.query)
+//         }
+//     });
+
+//     Ok(tx.clone())
+// }
 
 pub struct SelectIndex {
     // get by relation -> projection -> constraints
@@ -18,6 +39,13 @@ pub struct SelectIndex {
 }
 
 impl SelectIndex {
+
+    pub fn new() -> Self{
+        SelectIndex{
+            selects: HashMap::new()
+        }
+    }
+
     // access pattern to get all the addresses subscribed to a
     pub fn get_addr_for_insert(
         &self,
@@ -33,9 +61,9 @@ impl SelectIndex {
                 let hash_row = convert_row_to_hashmap(&insert_query.columns, &row);
 
                 for sel in select.iter() {
-                    if sel.0.evaluate(hash_row) {
-                        result_vec.push(sel.1);
-                    }
+                    // if sel.0.evaluate(hash_row) {
+                    //     result_vec.push(sel.1);
+                    // }
                 }
             }
 
@@ -51,16 +79,16 @@ impl SelectIndex {
         addr: &str,
         select_query: SelectQuery,
     ) -> Result<(), Box<dyn Error>> {
-        let current_select = self.selects.get_mut(&select_query.from);
+        // let current_select = self.selects.get_mut(&select_query.from);
 
-        if Some(select) = current_select {
-            select.push((select_query, addr.to_string()));
-        } else {
-            self.selects.insert(
-                select_query.from.to_string(),
-                vec![(select_query, addr.to_string())],
-            );
-        }
+        // if let Some(select) = current_select {
+        //     select.push((select_query, addr.to_string()));
+        // } else {
+        //     self.selects.insert(
+        //         select_query.from.to_string(),
+        //         vec![(select_query, addr.to_string())],
+        //     );
+        // }
 
         Ok(())
     }
